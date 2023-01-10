@@ -13,17 +13,30 @@ const entryTextSection = document.getElementById('entry-text');
 const movies = [];
 
 const updateUI = () => {
-    if(movies.length === 0) {
-        entryTextSection.style.display = 'block';
-    } else {
-        entryTextSection.style.display = 'none';
-    }
+  if (movies.length === 0) {
+    entryTextSection.style.display = 'block';
+  } else {
+    entryTextSection.style.display = 'none';
+  }
 };
 
-const renderNewMovieElement = (title, imageUrl, rating) => {
-    const newMovieElement = document.createElement('li');
-    newMovieElement.className = 'movie-element';
-    newMovieElement.innerHTML = `
+const deleteMovieHandler = (movieId) => {
+    let movieIndex = 0;
+    for(const movie of movies) {
+        if(movie.id === movieId) {
+            break;
+        }
+        movieIndex++;
+    }
+    movies.splice(movieIndex, 1);
+    const listRoot = document.getElementById('movie-list');
+    listRoot.children[movieIndex].remove();
+};
+
+const renderNewMovieElement = (id, title, imageUrl, rating) => {
+  const newMovieElement = document.createElement('li');
+  newMovieElement.className = 'movie-element';
+  newMovieElement.innerHTML = `
         <div class="movie-element__image">
             <img src="${imageUrl}">
         </div>
@@ -32,8 +45,9 @@ const renderNewMovieElement = (title, imageUrl, rating) => {
             <p>${rating}/5 stars</p>
         </div>
     `;
-    const listRoot = document.getElementById('movie-list');
-    listRoot.append(newMovieElement);
+  newMovieElement.addEventListener('click', deleteMovieHandler.bind(null, id));
+  const listRoot = document.getElementById('movie-list');
+  listRoot.append(newMovieElement);
 };
 
 const toggleMovieModal = () => {
@@ -48,9 +62,9 @@ const toggleBackdrop = () => {
 };
 
 const clearMovieInput = () => {
-    for(const usrInput of userInputs) {
-        usrInput.value = '';
-    }
+  for (const usrInput of userInputs) {
+    usrInput.value = '';
+  }
 };
 
 const cancelAddMovieHandler = () => {
@@ -75,16 +89,22 @@ const addMovieHandler = () => {
   }
 
   const newMovie = {
+    id: Math.random().toString(),
     title: titleValue,
     image: imageUrlValue,
-    rating: ratingValue
+    rating: ratingValue,
   };
 
   movies.push(newMovie);
   console.log(movies);
   toggleMovieModal();
   clearMovieInput();
-  renderNewMovieElement(newMovie.title, newMovie.image, newMovie.rating);
+  renderNewMovieElement(
+    newMovie.id,
+    newMovie.title,
+    newMovie.image,
+    newMovie.rating
+  );
   updateUI();
 };
 
